@@ -1,0 +1,330 @@
+import java.util.*;
+import java.io.*;
+enum N
+{
+    OldProcess,Hole,Segment,EmptyBlock;
+}
+class Node {
+     N NodeState;        // Equals false if this Node represents a hole
+    int     StartingAdd;       // Position in memory of first byte
+    int     size;        // Size that node occupies
+    int     FinishingAdd;
+    String SegmentName; // only if it's a segment
+    Node    next;
+
+
+    // Constructor for generating a hole or old process in memory
+
+    Node (int locn, int sz, Node nxt , N state) {
+        NodeState      = state;
+        StartingAdd     = locn;
+        size         = sz;
+        FinishingAdd = locn+sz-1;
+        next         = nxt;
+    }
+    // Constructor for generating a segment in memory
+
+    Node (int locn, int sz, Node nxt , N state,String name) {
+        NodeState      = state;
+        StartingAdd     = locn;
+        size         = sz;
+        FinishingAdd = locn+sz-1;
+        SegmentName = name;
+        next         = nxt;
+    }
+
+} // End Node class
+
+
+ //  Creates a linked-list of ndoes to simulate virtual memory segments and holes
+
+class Memory {
+    public  int MemorySize;  // Defines the total size for the memory
+     Node Head;// Refers to first node in memory
+     Node Tail;
+    private static int tempSize;
+
+
+    Memory (int size) {
+        MemorySize = size;
+        Node n = new Node (0, MemorySize,null,N.EmptyBlock);
+        Head = Tail=n;
+        tempSize=MemorySize;
+    }
+
+     public void  PutHoles(int startingAdd, int size)
+    {
+        if(size<=MemorySize && tempSize>=size )
+        {
+            // Put Old process at first node if the hole doesn't starting from 0
+            if(startingAdd!=0 &&Head.NodeState==N.EmptyBlock )
+            {
+                Node hole2=new Node(0,startingAdd , null,N.OldProcess);
+                Head=Tail=hole2;
+                tempSize=tempSize- startingAdd;
+            }
+            Node hole1 = new Node(startingAdd, size, null, N.Hole);
+            //Put hole in the first if it starting from 0
+            if(Head.size==MemorySize && Head.NodeState==N.EmptyBlock) {
+                Head = Tail=hole1;
+                tempSize=tempSize-size;
+
+            }
+            else // OP(0->49)>>H(50->149)>>OP(150->299)>>H(300->499)>>OP(500->799)>>H(800->949)>>OP(950->999)
+            {
+                if(Tail.FinishingAdd +1 != hole1.StartingAdd) {
+                    Node hole3 = new Node(Tail.FinishingAdd + 1, hole1.StartingAdd - (Tail.FinishingAdd+1), null, N.OldProcess);
+                    Tail.next = hole3;
+                    Tail = Tail.next;
+                    tempSize= tempSize - (hole3.size);
+                    Tail.next = hole1;
+                    Tail = Tail.next;
+                    tempSize= tempSize -(size);
+                }
+                else
+                {
+                    Tail.next=hole1;
+                    Tail=Tail.next;
+                    tempSize=tempSize-size;
+                }
+            }
+        }
+    }
+    // Put Old Process at Last if there's NOT Hole at the last
+     public void PutlastNode()
+    {
+        if(Tail.next==null && Memory.tempSize>0) {
+            Node hole4 = new Node(Tail.FinishingAdd+1 , MemorySize - (Tail.FinishingAdd+1), null, N.OldProcess);
+            Tail.next = hole4;
+            Tail = Tail.next;
+        }
+    }
+
+   /* static void front(Node n)
+    {
+        n.next = Head;
+        Head = n;
+    }
+    static void insert(Node a, Node p)
+    {
+        p.next = a.next;
+        a.next = p;
+    }*/
+
+
+
+    public static boolean tryPlace(Node current, int NewSegSize,String name1)
+    {
+        // If we are not looking at a hole, or the hole is too small, abort.
+        if (current.NodeState==N.Segment ||current.NodeState==N.OldProcess || current.size < NewSegSize)
+            return false;
+        int remainingSpace = current.size - NewSegSize;
+       /* current.size = NewSegSize;
+        current.NodeState=N.Segment;*/
+
+        // If there is any remaining space, create a new node representing
+        // the leftover hole.
+        if (remainingSpace > 0) {
+            // Create a new hole with the remaining space.
+            Node remainingHole = new Node(current.StartingAdd + NewSegSize, remainingSpace, current.next, N.Hole);
+           // current=new Node(current.StartingAdd,NewSegSize,remainingHole,N.Segment);
+            current.size = NewSegSize;
+            current.NodeState=N.Segment;
+            current.SegmentName=name1;
+            current.FinishingAdd=current.StartingAdd+NewSegSize-1;
+            current.next = remainingHole;
+            current.next.FinishingAdd=(current.StartingAdd + NewSegSize)+remainingSpace-1;
+
+            //Tail = remainingHole;
+        }
+        else
+        {
+            //current=new Node(current.StartingAdd,NewSegSize,current.next,N.Segment);
+            current.size = NewSegSize;
+            current.NodeState=N.Segment;
+            current.SegmentName=name1;
+            current.FinishingAdd=current.StartingAdd+NewSegSize-1;
+
+            //Tail=current;
+        }
+        return true;
+    }
+    public boolean FirstFit(int Size, String name)
+    {
+        Node current=Head;
+        for(Node n=current; current!=null; current=current.next )
+        {
+            if (tryPlace(current, Size,name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    public boolean BestFit(int Size, String name)
+    {
+        Node current=Head;
+        for(Node n=current; current!=null; current=current.next )
+        {
+            if (tryPlace(current, Size,name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public  boolean isEmpty() {
+        if (Head.size==MemorySize && Head.NodeState==N.EmptyBlock) {
+            return true;
+        }
+        return false;
+    }
+} // End Memory class
+
+
+
+public class MemAlloc {
+
+    static void Sort(Memory S)
+    {
+        if(S.isEmpty())
+        {  }
+        else {
+            Memory M1 = new Memory(S.MemorySize);
+            Node m, n;
+
+// H(0->99)>>H(100->599)>>H(600->799)>>H(800->1099)>>OP(1100->1199)>>H(1200->1799)>>OP(1800->1999)
+            for (m = S.Head; m != S.Tail; m = m.next) {
+                // int Min = S.Head.size;
+                Node MinimumNodeSize = m;
+                for (n = S.Head.next; n != null; n = n.next) {
+                    if (m.size > n.size ) {
+                        m.size = n.size;
+                        MinimumNodeSize = n;
+                    }
+                }
+                // int temp = arr[min_idx];
+                Node temp=new Node( MinimumNodeSize.StartingAdd,MinimumNodeSize.size,MinimumNodeSize.next,MinimumNodeSize.NodeState);
+                temp.FinishingAdd = MinimumNodeSize.FinishingAdd;
+                if (MinimumNodeSize.NodeState == N.Segment)
+                    temp.SegmentName = MinimumNodeSize.SegmentName;
+
+
+                //            arr[min_idx] = arr[i];
+                MinimumNodeSize.StartingAdd =S.Head.StartingAdd ;
+                MinimumNodeSize.size=S.Head.size ;
+                MinimumNodeSize.next= S.Head.next ;
+                MinimumNodeSize.NodeState= S.Head.NodeState;
+                MinimumNodeSize.FinishingAdd=S.Head.FinishingAdd ;
+                if (S.Head.NodeState == N.Segment)
+                    MinimumNodeSize.SegmentName=  S.Head.SegmentName;
+
+                //arr[i] = temp;
+                S.Head.StartingAdd=temp.StartingAdd;
+                S.Head.size=temp.size;
+                S.Head.FinishingAdd=temp.FinishingAdd;
+                S.Head.next=temp.next;
+                S.Head.NodeState=temp.NodeState;
+                if(temp.NodeState==N.Segment)
+                    S.Head.NodeState=temp.NodeState;
+               /* Node temp = MinimumNodeSize;
+                Node n1=new Node(temp.StartingAdd,temp.size,null,temp.NodeState);
+
+                if(M1.isEmpty())
+                    M1.Head=M1.Tail = n1;
+                else {
+                    M1.Tail.next=n1;
+                    M1.Tail = M1.Tail.next;
+                }
+                // to avoid redundant
+                if(flag==1)
+                    n.NodeState=N.EmptyBlock;
+                else
+                    m.NodeState=N.EmptyBlock;
+            }
+            return M1;*/
+            }
+        }
+
+    }
+    public static void main(String[] args)
+    {
+        // Used for accepting command line arguments
+        //Scanner sc = new Scanner (System.in);
+        // Used for testing purposes
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Enter Total Memory Size:");
+        int TotalMemSize=sc.nextInt();
+        Memory UnSortedMem=new Memory(TotalMemSize);
+        System.out.println("Holes Number:");
+        int HolesNum=sc.nextInt();
+        for(int h=0; h<HolesNum; h++) {
+            System.out.println("Hole Number:" + h);
+            System.out.println("starting add:");
+            int StartAdd = sc.nextInt();
+            System.out.println("hole size:");
+            int HoleSize = sc.nextInt();
+            UnSortedMem.PutHoles(StartAdd,HoleSize);
+        }
+        UnSortedMem.PutlastNode();
+
+
+        Memory SortedMem=new Memory(TotalMemSize);
+         Sort(UnSortedMem);
+        System.out.println("Enter Process:P:");
+
+        System.out.println("Segment number:");
+        int SegNumber = sc.nextInt();
+        int flag=0;
+
+        for(int s=0; s<SegNumber; s++)
+        {
+            System.out.println("Segment : "+s );
+            System.out.println("Segment name " );
+            String SegName=sc.nextLine();
+            System.out.println("Segment size:");
+            int SegSize = sc.nextInt();
+
+            if(UnSortedMem.FirstFit(SegSize,SegName))
+            {
+                flag++;
+            }
+        }
+        if(flag==SegNumber)
+            System.out.println("Allocated");
+        else
+            System.out.println("Not Allocated");
+
+
+
+
+
+
+
+
+
+
+
+
+        sc.close();
+    } // End main
+
+
+
+
+} // End MemAlloc class

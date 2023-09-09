@@ -1,0 +1,110 @@
+.root{
+-fx-background-color: #2B2B2B;
+}
+/* applied to every label in app */
+
+
+.button{
+-fx-background-color: linear-gradient(#dc9656,#eb6742);
+
+-fx-text-fill : #FFF;
+-fx-background-radius: 10;
+}
+/*.button:hover{
+-fx-background-color: linear-gradient(#dc9656,#eb6742);
+}*/
+.button:pressed{
+-fx-background-color: linear-gradient(#dc9656,#ab6442);
+}
+.combo-box{
+-fx-background-color: linear-gradient(#dc9656,#eb6742);
+
+-fx-background-radius: 10;
+}
+.combo-box .list-view .list-cell{
+
+-fx-text-fill : #000;
+}
+.combo-box  .list-cell{
+-fx-text-fill : #FFF;
+
+}
+.chart-title {
+  -fx-text-fill: #FFF;
+
+}
+
+.menu .label{
+
+ -fx-text-fill: #FFF;
+}
+.menu-bar{
+    -fx-background-color: #3C3F41;
+}
+.menu-button,
+.menu-item {
+    -fx-background-color: #3C3F41;
+}
+.context-menu {
+    -fx-background-color: #3C3F41;
+
+}
+.status-darkRed {
+    -fx-background-color:rgba(128,0,0,0.7);
+}
+.status-green {
+    -fx-background-color:rgba(0,128,0,0.7);
+}
+.status-blue {
+    -fx-background-color:rgba(0,0,128,0.7);
+}
+.status-yellow {
+    -fx-background-color:rgb(255, 255, 0);
+}
+.status-black {
+    -fx-background-color:#000;
+}
+.status-brown {
+    -fx-background-color:#9C6740;
+}
+.status-foshia {
+    -fx-background-color:#D737C6;
+}
+.status-bate5y {
+    -fx-background-color:#33D700;
+}
+.status-smawy {
+    -fx-background-color:#5AD6D7;
+}
+.status-nescafe {
+    -fx-background-color:#D7D582;
+}
+.status-orange {
+    -fx-background-color:#D7862B;
+}
+.status-red {
+    -fx-background-color:#F00;
+}
+.status-lamony{
+    -fx-background-color:#A6D73B;
+}
+.status-holoOrange {
+    -fx-background-color:#FFB556;
+}
+.status-purple {
+    -fx-background-color:#523256;
+}
+.status-move {
+    -fx-background-color:#A066A6;
+}
+.status-white {
+    -fx-background-color:#FFF;
+}
+#open{
+-fx-graphic: url("index.png");
+}
+
+
+
+
+

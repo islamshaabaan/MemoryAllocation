@@ -1,0 +1,55 @@
+.status-darkRed {
+    -fx-background-color:rgba(128,0,0,0.7);
+}
+.status-green {
+    -fx-background-color:rgba(0,128,0,0.7);
+}
+.status-blue {
+    -fx-background-color:rgba(0,0,128,0.7);
+}
+.status-yellow {
+    -fx-background-color:rgb(255, 255, 0);
+}
+.status-black {
+    -fx-background-color:#000;
+}
+.status-brown {
+    -fx-background-color:#9C6740;
+}
+.status-foshia {
+    -fx-background-color:#D737C6;
+}
+.status-bate5y {
+    -fx-background-color:#33D700;
+}
+.status-smawy {
+    -fx-background-color:#5AD6D7;
+}
+.status-nescafe {
+    -fx-background-color:#D7D582;
+}
+.status-orange {
+    -fx-background-color:#D7862B;
+}
+.status-red {
+    -fx-background-color:#F00;
+}
+.status-lamony{
+    -fx-background-color:#A6D73B;
+}
+.status-holoOrange {
+    -fx-background-color:#FFB556;
+}
+.status-purple {
+    -fx-background-color:#523256;
+}
+.status-move {
+    -fx-background-color:#A066A6;
+}
+.status-white {
+    -fx-background-color:#FFF;
+}
+
+
+
+
